@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: cbir
+      POSTGRES_USER: cbir
+      POSTGRES_PASSWORD: cbir
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cbir"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  seed:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://cbir:cbir@db:5432/cbir
+      DATA_DIR: /data
+    volumes: ["./data:/data"]
+    command:
+      - sh
+      - -c
+      - |
+        python -m backend.scripts.generate_demo --output /data/images/objects &&
+        python -m backend.scripts.ingest_images --dataset objects --directory /data/images/objects &&
+        python -m backend.scripts.compute_descriptors --dataset objects &&
+        python -m backend.scripts.build_indexes --dataset objects
+    depends_on:
+      db: {condition: service_healthy}
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://cbir:cbir@db:5432/cbir
+      DATA_DIR: /data
+      PUBLIC_BASE_URL: http://localhost:8000
+      API_CORS_ORIGINS: http://localhost:8080
+    volumes: ["./data:/data"]
+    ports: ["8000:8000"]
+    depends_on:
+      db: {condition: service_healthy}
+      seed: {condition: service_completed_successfully}
+
+  web:
+    build: ./frontend
+    ports: ["8080:80"]
+    depends_on: [api]
+
+volumes:
+  postgres_data:

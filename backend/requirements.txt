@@ -1,0 +1,18 @@
+fastapi==0.115.12
+python-multipart==0.0.20
+uvicorn[standard]==0.34.0
+pydantic==2.10.6
+numpy==2.2.3
+scipy==1.15.2
+opencv-python-headless==4.11.0.86
+scikit-image==0.25.2
+SQLAlchemy==2.0.38
+psycopg[binary]==3.2.6
+pytest==8.3.4
+matplotlib==3.10.0
+tqdm==4.67.1
+# VGG16 pretrained ImageNet descriptor (CPU build can be installed as documented in README).
+torch==2.6.0
+torchvision==0.21.0
+Pillow==11.1.0
+python-dotenv==1.0.1
