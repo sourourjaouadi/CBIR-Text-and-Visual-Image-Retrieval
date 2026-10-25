@@ -5,13 +5,5 @@ __pycache__/
 node_modules/
 dist/
 .env
-data/images/**
-!data/images/.gitkeep
-data/descriptors/**
-!data/descriptors/.gitkeep
-data/indexes/**
-!data/indexes/.gitkeep
-data/evaluation/**
-!data/evaluation/.gitkeep
 .benchmark/
 cbir.db
